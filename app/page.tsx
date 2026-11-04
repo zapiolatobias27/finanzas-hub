@@ -4,6 +4,7 @@ import { CategoryTable } from "@/components/category-table";
 import { GoalForm, InvestorProfileForm, TransactionForm } from "@/components/finance-forms";
 import { IntegrationsPanel } from "@/components/integrations-panel";
 import { InvestmentPlan } from "@/components/investment-plan";
+import { MonthlyEvolution } from "@/components/monthly-evolution";
 import { SummaryCards } from "@/components/summary-cards";
 import { shiftMonth } from "@/lib/budget";
 import { CATEGORIES, type Category } from "@/lib/categories";
@@ -56,7 +57,23 @@ export default async function FinanceDashboard({ searchParams }: { searchParams:
         </p>
       )}
 
-      <SummaryCards summary={data.summary} portfolioArs={data.portfolioArs} />
+      <SummaryCards
+        summary={data.summary}
+        portfolioArs={data.portfolioArs}
+        inProgress={
+          month === today.slice(0, 7)
+            ? {
+                day: Number(today.slice(8)),
+                days: new Date(Date.UTC(Number(month.slice(0, 4)), Number(month.slice(5)), 0)).getUTCDate(),
+                avgExpenses: data.averages && data.averages.months > 0 ? data.averages.expenses : null,
+              }
+            : undefined
+        }
+      />
+
+      <div className="reveal" style={delay(3)}>
+        <MonthlyEvolution history={data.history} current={month} />
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
         <div className="space-y-6">

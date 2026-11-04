@@ -5,7 +5,16 @@ import { cn } from "@/lib/utils";
 
 const delay = (i: number) => ({ "--i": i }) as React.CSSProperties;
 
-export function SummaryCards({ summary, portfolioArs }: { summary: MonthSummary; portfolioArs: number }) {
+export function SummaryCards({
+  summary,
+  portfolioArs,
+  inProgress,
+}: {
+  summary: MonthSummary;
+  portfolioArs: number;
+  /** Solo para el mes en curso: el ahorro todavía no es el definitivo. */
+  inProgress?: { day: number; days: number; avgExpenses: number | null };
+}) {
   const rate = Math.round(summary.savingsRate * 100);
   const total = Math.max(summary.income, summary.expenses, 1);
   const kpis = [
@@ -25,10 +34,22 @@ export function SummaryCards({ summary, portfolioArs }: { summary: MonthSummary;
             </p>
             <p className={cn("num mt-2 text-5xl font-semibold md:text-6xl", summary.net < 0 && "text-danger")}>{formatMoney(summary.net)}</p>
           </div>
-          <span className={cn("chip num shrink-0", rate >= 20 ? "border-success/30 bg-success/10 text-success" : rate >= 0 ? "border-warn/30 bg-warn/10 text-warn" : "border-danger/30 bg-danger/10 text-danger")}>
-            {rate}% de ahorro
-          </span>
+          {inProgress ? (
+            <span className="chip num shrink-0 text-muted">
+              Mes en curso · día {inProgress.day} de {inProgress.days}
+            </span>
+          ) : (
+            <span className={cn("chip num shrink-0", rate >= 20 ? "border-success/30 bg-success/10 text-success" : rate >= 0 ? "border-warn/30 bg-warn/10 text-warn" : "border-danger/30 bg-danger/10 text-danger")}>
+              {rate}% de ahorro
+            </span>
+          )}
         </div>
+        {inProgress?.avgExpenses && (
+          <p className="relative mt-2 text-sm text-muted">
+            Llevás gastado <span className="num text-ink">{formatMoney(summary.expenses)}</span> de un promedio de{" "}
+            <span className="num text-ink">{formatMoney(inProgress.avgExpenses)}</span> por mes.
+          </p>
+        )}
         <div className="relative mt-6 space-y-2">
           {[
             { label: "Ingresos", value: summary.income, color: "bg-accent" },

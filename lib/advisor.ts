@@ -156,7 +156,8 @@ export function buildInvestmentPlan(input: AdvisorInput): InvestmentPlan {
       monthlyAmount: amount,
       horizonMonths: 0,
       currency: "ARS",
-      instruments: instrumentMix(0, 1, "ARS"),
+      // La emergencia tiene que estar disponible en el día: 100% liquidez inmediata.
+      instruments: [{ ...I.moneyMarket, weight: 1 }],
       note: `Objetivo: ${input.emergencyMonths} meses de gastos. Te faltan ${Math.round(emergencyGap).toLocaleString("es-AR")} ARS.`,
     });
   }

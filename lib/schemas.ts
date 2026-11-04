@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CRYPTO_IDS, isValidAddress } from "./assets";
 import { CATEGORY_KEYS } from "./categories";
 
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha inválida");
@@ -37,4 +38,44 @@ export const investorProfileSchema = z.object({
 export const iolCredentialsSchema = z.object({
   username: z.string().trim().min(1, "Ingresá tu usuario de IOL"),
   password: z.string().min(1, "Ingresá tu contraseña de IOL"),
+});
+
+export const walletSchema = z
+  .object({
+    chain: z.enum(["bitcoin", "ethereum"]),
+    address: z.string().trim().min(1, "Pegá la dirección pública de la billetera"),
+    label: z.string().trim().max(40).optional().default(""),
+  })
+  .refine((w) => isValidAddress(w.chain, w.address), {
+    path: ["address"],
+    message: "Esa dirección no parece válida para la red elegida. Revisá que sea la pública (no la frase semilla).",
+  });
+
+export const positionSchema = z
+  .object({
+    kind: z.enum(["cedear", "accion", "cripto"]),
+    symbol: z
+      .string()
+      .trim()
+      .toUpperCase()
+      .regex(/^[A-Z0-9.]{1,12}$/, "Usá el ticker, por ejemplo SPY, GGAL o BTC"),
+    quantity: z.coerce.number().positive("La cantidad tiene que ser mayor a 0"),
+    avgPrice: z.preprocess((v) => (v === "" ? undefined : v), z.coerce.number().min(0).optional()),
+  })
+  .refine((p) => p.kind !== "cripto" || p.symbol in CRYPTO_IDS, {
+    path: ["symbol"],
+    message: `Cripto no soportada todavía. Probá con: ${Object.keys(CRYPTO_IDS).join(", ")}`,
+  });
+
+export const consultAnswersSchema = z.object({
+  amount: z.number().positive("Indicá cuánto querés invertir").max(1e12),
+  currency: z.enum(["ARS", "USD"]),
+  goal: z.enum(["preservar", "dolarizar", "renta", "crecer"]),
+  targetReturn: z.number().min(0).max(50),
+  horizon: z.enum(["lt1", "1to3", "3to5", "gt5"]),
+  maxDrawdown: z.number().min(0).max(60),
+  reaction: z.enum(["vendo", "espero", "compro"]),
+  needsLiquidity: z.boolean(),
+  experience: z.enum(["ninguna", "basica", "intermedia", "avanzada"]),
+  crypto: z.enum(["no", "poco", "si"]),
 });

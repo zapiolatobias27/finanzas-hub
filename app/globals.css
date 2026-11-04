@@ -179,6 +179,22 @@
   50% { transform: scale(1.35); opacity: 0.55; }
 }
 .animate-pop { animation: pop 0.45s var(--ease-out) both; }
+.bar-grow {
+  transform-origin: bottom;
+  animation: bar-grow 0.9s var(--ease-out) both;
+}
+@keyframes bar-grow {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+.line-draw {
+  stroke-dasharray: 1;
+  animation: line-draw 1.6s var(--ease-out) both;
+}
+@keyframes line-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
 .ring-draw {
   stroke-dashoffset: var(--ring-to);
   animation: ring-draw 1.4s var(--ease-out) both;

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { Inter_Tight, JetBrains_Mono } from "next/font/google";
+import { AppNav } from "@/components/app-nav";
 import { BrandMark } from "@/components/brand-mark";
 import { BRAND } from "@/lib/brand";
 import "./globals.css";
@@ -33,7 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {BRAND.name}
               </span>
             </Link>
-            <span className="hidden text-xs text-muted sm:block">{BRAND.tagline}</span>
+            <AppNav />
           </div>
         </header>
         <main id="main" className="mx-auto max-w-6xl px-4 pb-16 pt-8">
