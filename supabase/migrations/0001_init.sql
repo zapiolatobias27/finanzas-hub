@@ -99,3 +99,4 @@ as $$
 $$;
 revoke all on function public.my_integrations() from public;
 grant execute on function public.my_integrations() to authenticated;
+revoke execute on function public.my_integrations() from anon;

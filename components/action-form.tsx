@@ -1,5 +1,6 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
 import { useRef, useState, useTransition } from "react";
 import type { ActionResult } from "@/lib/action-result";
 import { cn } from "@/lib/utils";
@@ -10,11 +11,15 @@ export function ActionForm({
   children,
   submitLabel,
   className,
+  buttonClassName,
+  style,
 }: {
   action: (formData: FormData) => Promise<ActionResult>;
   children: React.ReactNode;
   submitLabel: string;
   className?: string;
+  buttonClassName?: string;
+  style?: React.CSSProperties;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
   const [pending, startTransition] = useTransition();
@@ -33,22 +38,24 @@ export function ActionForm({
   const errors = result && !result.ok ? Object.values(result.errors ?? {}).flat().filter(Boolean) : [];
 
   return (
-    <form ref={formRef} onSubmit={onSubmit} className={cn("space-y-2", className)}>
+    <form ref={formRef} onSubmit={onSubmit} className={cn("space-y-3", className)} style={style}>
       {children}
-      <button
-        disabled={pending}
-        className="rounded-md bg-neutral-900 px-3 py-1.5 text-sm text-white disabled:opacity-50 dark:bg-white dark:text-neutral-900"
-      >
+      <button disabled={pending} className={cn("btn-primary", buttonClassName)}>
+        {pending && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
         {pending ? "Guardando…" : submitLabel}
       </button>
-      {result?.message && <p className={cn("text-sm", result.ok ? "text-emerald-600" : "text-red-600")}>{result.message}</p>}
-      {errors.map((msg) => (
-        <p key={msg} className="text-sm text-red-600">
-          {msg}
-        </p>
-      ))}
+      <div aria-live="polite" className="contents">
+        {result?.message && (
+          <p className={cn("animate-pop text-sm", result.ok ? "text-success" : "text-danger")}>{result.message}</p>
+        )}
+        {errors.map((msg) => (
+          <p key={msg} className="animate-pop text-sm text-danger">
+            {msg}
+          </p>
+        ))}
+      </div>
     </form>
   );
 }
 
-export const inputClass = "w-full rounded-md border px-2 py-1.5 text-sm dark:border-neutral-700 dark:bg-neutral-900";
+export const inputClass = "input";
